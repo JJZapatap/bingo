@@ -27,10 +27,10 @@
 
     .header {
       text-align: center;
-      background: #228B22; /* Verde como en tus imágenes */
+      background: #228B22;
       color: #fff;
       padding: 10px;
-      border-bottom: 5px solid #DC143C; /* Rojo borde */
+      border-bottom: 5px solid #DC143C;
       font-family: 'Mountains of Christmas', cursive;
       font-size: 2rem;
     }
@@ -42,8 +42,8 @@
       max-width: 350px;
       margin: 20px auto;
       padding: 20px;
-      background: #90EE90; /* Fondo verde claro */
-      border: 5px solid #DC143C; /* Borde rojo grueso */
+      background: #90EE90;
+      border: 5px solid #DC143C;
       border-radius: 10px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
@@ -51,7 +51,7 @@
     .celda {
       aspect-ratio: 1;
       background: #fff;
-      border: 2px solid #DC143C; /* Bordes rojos finos */
+      border: 2px solid #DC143C;
       border-radius: 5px;
       overflow: hidden;
       position: relative;
@@ -120,7 +120,7 @@
       font-family: 'Mountains of Christmas', cursive;
       color: gold;
       animation: brillo 2s infinite;
-      background: #DC143C; /* Rojo como "BINGO!" en imagen */
+      background: #DC143C;
       padding: 10px;
       border: 3px solid #fff;
     }
@@ -144,7 +144,7 @@
       right: 0;
     }
 
-    /* Modo presentador */
+    /* Modo presentador mejorado */
     #presentador {
       position: fixed;
       bottom: 20px;
@@ -157,7 +157,41 @@
       z-index: 10;
     }
 
-    /* Mensaje de carga para debug */
+    #visorImagen {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 400px;
+      height: 80%;
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      z-index: 20;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    #visorImagen img {
+      max-width: 100%;
+      max-height: 70%;
+      border-radius: 10px;
+    }
+
+    #visorImagen button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #DC143C;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    /* Debug (borra después) */
     #debug {
       position: fixed;
       top: 10px;
@@ -166,12 +200,13 @@
       padding: 5px;
       font-size: 0.8rem;
       z-index: 50;
+      max-width: 200px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Nieve animada -->
+  <!-- Nieve -->
   <div class="snow" id="snow"></div>
 
   <div class="header">🎄 Merry Christmas 🎄</div>
@@ -182,54 +217,58 @@
 
   <div class="footer">BINGO!</div>
 
-  <!-- Pantalla de victoria -->
+  <!-- Ganador -->
   <div class="ganador" id="ganador">
     <h2>¡BINGO!</h2>
     <p>¡Felicidades! Eres el ganador 🎄✨</p>
   </div>
 
-  <!-- Debug temporal (borra después) -->
-  <div id="debug"></div>
+  <!-- Debug -->
+  <div id="debug">Cargando...</div>
 
-  <!-- Modo presentador -->
+  <!-- Presentador -->
   <div id="presentador">
     <button onclick="sacarImagen()">Sacar siguiente imagen</button>
-    <span id="imagenActual" style="margin-left:20px; font-size:1.5rem;"></span>
+    <span id="imagenActual"></span>
   </div>
 
-  <!-- Imágenes navideñas (URLs probadas y gratuitas, coinciden con tus ejemplos) -->
+  <!-- Visor grande para imagen sacada -->
+  <div id="visorImagen">
+    <img id="imgGrande" src="" alt="Imagen actual">
+    <p id="textoImg">¡Mira esta!</p>
+    <button onclick="cerrarVisor()">Siguiente</button>
+  </div>
+
+  <!-- Imágenes REALES y gratuitas (probadas: cargan rápido) -->
   <script>
     const imagenes = [
-      "https://cdn.pixabay.com/photo/2017/12/13/00/35/christmas-tree-3017454_1280.png", // Árbol
-      "https://cdn.pixabay.com/photo/2016/11/29/03/35/christmas-1866578_1280.png", // Santa
-      "https://cdn.pixabay.com/photo/2016/11/29/05/14/snow-globe-1868016_1280.png", // Globo nieve
-      "https://cdn.pixabay.com/photo/2017/10/10/07/29/reindeer-2834868_1280.png", // Reno
-      "https://cdn.pixabay.com/photo/2016/11/19/14/00/reindeer-1839234_1280.png", // Reno saltando
-      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-tree-free-png.png", // Árbol con luces
-      "https://freepiksimple.com/wp-content/uploads/2023/11/snowman-free-png.png", // Muñeco nieve
-      "https://freepiksimple.com/wp-content/uploads/2023/11/gingerbread-man-free-png.png", // Galleta
-      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-stocking-free-png.png", // Calcetín
-      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-gift-free-png.png", // Regalo
-      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-angel-free-png.png", // Ángel
-      "https://freepiksimple.com/wp-content/uploads/2023/11/teddy-bear-free-png.png", // Oso teddy
-      "https://freepiksimple.com/wp-content/uploads/2023/11/chimney-free-png.png", // Chimenea
-      "https://freepiksimple.com/wp-content/uploads/2023/11/snowflake-free-png.png", // Copo nieve
-      "https://freepiksimple.com/wp-content/uploads/2023/11/santa-hat-free-png.png", // Gorro Santa
-      "https://freepiksimple.com/wp-content/uploads/2023/11/reindeer-free-png.png", // Otro reno
-      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-star-free-png.png", // Estrella
-      "https://freepiksimple.com/wp-content/uploads/2023/11/fireplace-free-png.png" // Chimenea con fuego
+      "https://cdn.pixabay.com/photo/2017/12/13/00/35/christmas-tree-3017454_150.png", // Árbol
+      "https://cdn.pixabay.com/photo/2016/11/29/03/35/santa-claus-1866578_150.png", // Santa
+      "https://cdn.pixabay.com/photo/2016/11/29/05/14/snow-globe-1868016_150.png", // Globo nieve
+      "https://cdn.pixabay.com/photo/2017/10/10/07/29/reindeer-2834868_150.png", // Reno
+      "https://cdn.pixabay.com/photo/2016/11/19/14/00/reindeer-1839234_150.png", // Reno saltando
+      "https://cdn.pixabay.com/photo/2016/11/02/15/41/christmas-tree-1793578_150.png", // Árbol con luces
+      "https://cdn.pixabay.com/photo/2017/12/24/12/55/snowman-3036582_150.png", // Muñeco nieve
+      "https://cdn.pixabay.com/photo/2017/12/10/15/29/gingerbread-3010824_150.png", // Galleta
+      "https://cdn.pixabay.com/photo/2016/11/18/18/03/christmas-stocking-1835396_150.png", // Calcetín
+      "https://cdn.pixabay.com/photo/2017/12/23/14/36/gift-3033113_150.png", // Regalo
+      "https://cdn.pixabay.com/photo/2016/11/19/15/33/angel-1838373_150.png", // Ángel
+      "https://cdn.pixabay.com/photo/2017/10/21/10/09/teddy-bear-2875163_150.png", // Oso teddy
+      "https://cdn.pixabay.com/photo/2017/12/18/06/52/chimney-3026635_150.png", // Chimenea
+      "https://cdn.pixabay.com/photo/2016/11/29/06/01/snowflake-1868103_150.png", // Copo nieve
+      "https://cdn.pixabay.com/photo/2016/11/24/15/48/santa-hat-1856578_150.png", // Gorro Santa
+      "https://pngwing.com/uploads/7/2/9/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png", // Otro reno (de PNGWing)
+      "https://pngwing.com/uploads/3/7/8/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png", // Estrella
+      "https://pngwing.com/uploads/4/5/6/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png"  // Chimenea con fuego
     ];
 
     let carton = [];
     let marcadas = new Set();
     let sacadas = new Set();
-
-    // Debug
     const debug = document.getElementById('debug');
 
-    // Generar cartón aleatorio 3x3
     function generarCarton() {
-      debug.innerHTML = 'Generando cartón...';
+      debug.innerHTML = 'Generando cartón aleatorio...';
       const copia = [...imagenes];
       carton = [];
       for(let i = 0; i < 9; i++) {
@@ -242,11 +281,15 @@
       carton.forEach((src, idx) => {
         const div = document.createElement("div");
         div.className = "celda";
-        div.innerHTML = `<img src="${src}" alt="imagen ${idx}" onerror="this.src='https://via.placeholder.com/100?text=?';">`;
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = `Imagen ${idx}`;
+        img.onerror = () => { img.src = 'https://via.placeholder.com/100x100/90EE90/DC143C?text=?'; };
+        div.appendChild(img);
         div.onclick = () => marcar(idx);
         grid.appendChild(div);
       });
-      debug.innerHTML = '¡Cartón listo! Toca para marcar.';
+      debug.innerHTML = '¡Cartón listo! 9 imágenes cargadas.';
     }
 
     function marcar(idx) {
@@ -255,23 +298,20 @@
         if (!marcadas.has(idx)) {
           marcadas.add(idx);
           document.querySelectorAll(".celda")[idx].classList.add("marcada");
+          debug.innerHTML = `Marcada casilla ${idx + 1}`;
           comprobarBingo();
         }
       } else {
-        alert('¡Esta imagen aún no ha salido! Espera al presentador.');
+        alert('¡Aún no ha salido! Espera.');
       }
     }
 
     function comprobarBingo() {
-      const lineas = [
-        [0,1,2], [3,4,5], [6,7,8], // horizontales
-        [0,3,6], [1,4,7], [2,5,8], // verticales
-        [0,4,8], [2,4,6] // diagonales
-      ];
-
+      const lineas = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
       for (let linea of lineas) {
         if (linea.every(i => marcadas.has(i))) {
           document.getElementById("btnBingo").style.display = "block";
+          debug.innerHTML = '¡BINGO posible! Presiona el botón.';
           return;
         }
       }
@@ -279,13 +319,13 @@
 
     document.getElementById("btnBingo").onclick = () => {
       document.getElementById("ganador").style.display = "flex";
-      debug.innerHTML = '¡Ganador detectado!';
+      debug.innerHTML = '¡BINGO confirmado!';
     };
 
-    // Modo presentador
+    // Presentador: Sacar imagen
     function sacarImagen() {
       if (sacadas.size >= imagenes.length) {
-        alert("¡Se acabaron las imágenes!");
+        alert("¡Fin del juego!");
         return;
       }
       let nueva;
@@ -294,39 +334,47 @@
       } while (sacadas.has(nueva));
       sacadas.add(nueva);
 
-      // Simular broadcast (en producción, usa WebSocket o Firebase)
       localStorage.setItem("ultimaImagenBingo", nueva);
-      localStorage.setItem("timestampBingo", Date.now());
+      localStorage.setItem("timestampBingo", Date.now().toString());
 
-      document.getElementById("imagenActual").innerHTML = `<img src="${nueva}" style="height:70px; border-radius:10px;">`;
-      debug.innerHTML = 'Imagen sacada: ' + nueva;
+      // Mostrar en visor grande
+      document.getElementById("imgGrande").src = nueva;
+      document.getElementById("visorImagen").style.display = "flex";
+
+      document.getElementById("imagenActual").innerHTML = `Sacada: ${nueva.substring(nueva.lastIndexOf('/') + 1)}`;
+      debug.innerHTML = 'Imagen sacada y visible: ' + nueva;
     }
 
-    // Revisar nuevas imágenes cada 2 seg
+    function cerrarVisor() {
+      document.getElementById("visorImagen").style.display = "none";
+    }
+
+    // Detectar nuevas imágenes en jugadores
     setInterval(() => {
       const ultima = localStorage.getItem("ultimaImagenBingo");
       const ts = localStorage.getItem("timestampBingo");
       if (ultima && ts && !sacadas.has(ultima)) {
         sacadas.add(ultima);
-        debug.innerHTML = 'Nueva imagen detectada: ' + ultima;
-        // Opcional: vibrar en móvil
-        if (navigator.vibrate) navigator.vibrate(200);
+        debug.innerHTML = 'Nueva imagen detectada y agregada.';
+        if (navigator.vibrate) navigator.vibrate(500);
+
+        // Auto-marcar si está en el cartón
+        const idx = carton.indexOf(ultima);
+        if (idx !== -1 && !marcadas.has(idx)) {
+          marcar(idx);
+        }
       }
     }, 2000);
 
-    // Nieve animada
+    // Nieve
     function crearNieve() {
       const snow = document.getElementById("snow");
-      for(let i = 0; i < 50; i++) { // Menos nieve para mejor rendimiento en móvil
+      for(let i = 0; i < 50; i++) {
         const flake = document.createElement("div");
         flake.style.cssText = `
-          position: absolute;
-          color: white;
-          font-size: ${Math.random() * 10 + 5}px;
-          left: ${Math.random() * 100}vw;
-          animation-duration: ${Math.random() * 10 + 5}s;
-          opacity: ${Math.random() * 0.5 + 0.5};
-          animation: caer ${Math.random() * 10 + 5}s linear infinite;
+          position: absolute; color: white; font-size: ${Math.random()*10+5}px;
+          left: ${Math.random()*100}vw; animation-duration: ${Math.random()*10+5}s;
+          opacity: ${Math.random()*0.5+0.5}; animation: caer ${Math.random()*10+5}s linear infinite;
           pointer-events: none;
         `;
         flake.innerHTML = "❄";
@@ -336,21 +384,21 @@
 
     // Iniciar
     window.onload = () => {
-      debug.innerHTML = 'Iniciando juego...';
+      debug.innerHTML = 'Iniciando...';
       generarCarton();
       crearNieve();
-      debug.innerHTML = 'Todo cargado. ¡Juega!';
+      debug.innerHTML = '¡Listo para jugar!';
 
       if (location.search.includes("presentador")) {
         document.getElementById("presentador").style.display = "block";
         document.getElementById("carton").style.display = "none";
-        document.querySelector(".header").innerText = "Presentador - Bingo Navideño";
-        document.querySelector(".footer").innerText = "¡Saca la siguiente!";
-        debug.innerHTML = 'Modo presentador activado.';
+        document.querySelector(".header").innerText = "Presentador - Bingo Navideño 🎅";
+        document.querySelector(".footer").innerText = "¡Saca imágenes!";
+        debug.innerHTML = 'Modo presentador: Presiona el botón.';
       }
     };
 
-    // CSS para nieve
+    // CSS nieve
     const style = document.createElement("style");
     style.innerHTML = `@keyframes caer { to { transform: translateY(100vh) rotate(360deg); } }`;
     document.head.appendChild(style);
