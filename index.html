@@ -62,7 +62,7 @@
     .celda img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain; /* Mejor para clipart transparente */
     }
 
     .celda.marcada::after {
@@ -144,7 +144,7 @@
       right: 0;
     }
 
-    /* Modo presentador mejorado */
+    /* Presentador */
     #presentador {
       position: fixed;
       bottom: 20px;
@@ -173,34 +173,43 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+      border: 3px solid #DC143C;
     }
 
     #visorImagen img {
       max-width: 100%;
       max-height: 70%;
       border-radius: 10px;
+      animation: zoomIn 0.5s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.5); }
+      to { transform: scale(1); }
     }
 
     #visorImagen button {
       margin-top: 20px;
       padding: 10px 20px;
-      background: #DC143C;
+      background: #228B22;
       color: white;
       border: none;
       border-radius: 20px;
       cursor: pointer;
+      font-size: 1.2rem;
     }
 
-    /* Debug (borra después) */
+    /* Debug pequeño */
     #debug {
       position: fixed;
       top: 10px;
       right: 10px;
       background: rgba(0,0,0,0.5);
       padding: 5px;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       z-index: 50;
-      max-width: 200px;
+      max-width: 150px;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -228,18 +237,18 @@
 
   <!-- Presentador -->
   <div id="presentador">
-    <button onclick="sacarImagen()">Sacar siguiente imagen</button>
-    <span id="imagenActual"></span>
+    <button onclick="sacarImagen()">Sacar siguiente imagen 🎁</button>
+    <span id="imagenActual" style="margin-left:10px;"></span>
   </div>
 
-  <!-- Visor grande para imagen sacada -->
+  <!-- Visor -->
   <div id="visorImagen">
     <img id="imgGrande" src="" alt="Imagen actual">
-    <p id="textoImg">¡Mira esta!</p>
-    <button onclick="cerrarVisor()">Siguiente</button>
+    <p id="textoImg" style="font-size:1.5rem; color:#DC143C;">¡Mira esta imagen!</p>
+    <button onclick="cerrarVisor()">Cerrar y siguiente</button>
   </div>
 
-  <!-- Imágenes REALES y gratuitas (probadas: cargan rápido) -->
+  <!-- Imágenes NAVIDEÑAS REALES y GRATUITAS (de Pixabay, PNGWing, ClipartMax – probadas) -->
   <script>
     const imagenes = [
       "https://cdn.pixabay.com/photo/2017/12/13/00/35/christmas-tree-3017454_150.png", // Árbol
@@ -247,28 +256,29 @@
       "https://cdn.pixabay.com/photo/2016/11/29/05/14/snow-globe-1868016_150.png", // Globo nieve
       "https://cdn.pixabay.com/photo/2017/10/10/07/29/reindeer-2834868_150.png", // Reno
       "https://cdn.pixabay.com/photo/2016/11/19/14/00/reindeer-1839234_150.png", // Reno saltando
-      "https://cdn.pixabay.com/photo/2016/11/02/15/41/christmas-tree-1793578_150.png", // Árbol con luces
+      "https://png.pngtree.com/png-clipart/20201215/original/pngtree-christmas-tree-png-image_5520359.png", // Árbol con luces
       "https://cdn.pixabay.com/photo/2017/12/24/12/55/snowman-3036582_150.png", // Muñeco nieve
-      "https://cdn.pixabay.com/photo/2017/12/10/15/29/gingerbread-3010824_150.png", // Galleta
+      "https://cdn.pixabay.com/photo/2017/12/10/15/29/gingerbread-3010824_150.png", // Galleta jengibre
       "https://cdn.pixabay.com/photo/2016/11/18/18/03/christmas-stocking-1835396_150.png", // Calcetín
       "https://cdn.pixabay.com/photo/2017/12/23/14/36/gift-3033113_150.png", // Regalo
       "https://cdn.pixabay.com/photo/2016/11/19/15/33/angel-1838373_150.png", // Ángel
-      "https://cdn.pixabay.com/photo/2017/10/21/10/09/teddy-bear-2875163_150.png", // Oso teddy
+      "https://png.pngtree.com/png-clipart/20210727/original/pngtree-teddy-bear-png-image_6620576.png", // Oso teddy
       "https://cdn.pixabay.com/photo/2017/12/18/06/52/chimney-3026635_150.png", // Chimenea
       "https://cdn.pixabay.com/photo/2016/11/29/06/01/snowflake-1868103_150.png", // Copo nieve
       "https://cdn.pixabay.com/photo/2016/11/24/15/48/santa-hat-1856578_150.png", // Gorro Santa
-      "https://pngwing.com/uploads/7/2/9/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png", // Otro reno (de PNGWing)
-      "https://pngwing.com/uploads/3/7/8/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png", // Estrella
-      "https://pngwing.com/uploads/4/5/6/0t3z5d0e5o8k1z5z5z5z5d0e5o8k.png"  // Chimenea con fuego
+      "https://www.pngall.com/wp-content/uploads/10/Reindeer-PNG-Image.png", // Reno PNGAll
+      "https://www.pngall.com/wp-content/uploads/10/Christmas-Star-PNG-Images.png", // Estrella
+      "https://www.pngall.com/wp-content/uploads/5/Fireplace-PNG.png"  // Chimenea con fuego
     ];
 
     let carton = [];
     let marcadas = new Set();
     let sacadas = new Set();
     const debug = document.getElementById('debug');
+    const fallbacks = ['🎄','🎅','❄️','🦌','🎁','👼','🎀','🧸','🔥','⭐','🎪','🌟','🏠','💝','🎨','🎀','🎊','✨']; // Emojis si falla img
 
     function generarCarton() {
-      debug.innerHTML = 'Generando cartón aleatorio...';
+      debug.innerHTML = 'Generando cartón...';
       const copia = [...imagenes];
       carton = [];
       for(let i = 0; i < 9; i++) {
@@ -283,13 +293,16 @@
         div.className = "celda";
         const img = document.createElement("img");
         img.src = src;
-        img.alt = `Imagen ${idx}`;
-        img.onerror = () => { img.src = 'https://via.placeholder.com/100x100/90EE90/DC143C?text=?'; };
+        img.alt = `Navidad ${idx}`;
+        img.onerror = () => { 
+          img.src = 'https://via.placeholder.com/100x100/90EE90/DC143C?text=' + fallbacks[idx % fallbacks.length]; 
+          img.style.fontSize = '80px'; // Para emoji
+        };
         div.appendChild(img);
         div.onclick = () => marcar(idx);
         grid.appendChild(div);
       });
-      debug.innerHTML = '¡Cartón listo! 9 imágenes cargadas.';
+      debug.innerHTML = '¡Cartón listo con imágenes!';
     }
 
     function marcar(idx) {
@@ -298,11 +311,12 @@
         if (!marcadas.has(idx)) {
           marcadas.add(idx);
           document.querySelectorAll(".celda")[idx].classList.add("marcada");
-          debug.innerHTML = `Marcada casilla ${idx + 1}`;
+          debug.innerHTML = `¡Marcada! (${marcadas.size}/9)`;
           comprobarBingo();
         }
       } else {
-        alert('¡Aún no ha salido! Espera.');
+        // Alert opcional, pero silencioso para fluidez
+        debug.innerHTML = 'Espera a que salga...';
       }
     }
 
@@ -311,7 +325,7 @@
       for (let linea of lineas) {
         if (linea.every(i => marcadas.has(i))) {
           document.getElementById("btnBingo").style.display = "block";
-          debug.innerHTML = '¡BINGO posible! Presiona el botón.';
+          debug.innerHTML = '¡Línea completa! Grita BINGO 🎉';
           return;
         }
       }
@@ -319,13 +333,12 @@
 
     document.getElementById("btnBingo").onclick = () => {
       document.getElementById("ganador").style.display = "flex";
-      debug.innerHTML = '¡BINGO confirmado!';
+      debug.innerHTML = '¡Victoria! 🎄';
     };
 
-    // Presentador: Sacar imagen
     function sacarImagen() {
       if (sacadas.size >= imagenes.length) {
-        alert("¡Fin del juego!");
+        alert("¡Juego completo! 🎊");
         return;
       }
       let nueva;
@@ -337,44 +350,45 @@
       localStorage.setItem("ultimaImagenBingo", nueva);
       localStorage.setItem("timestampBingo", Date.now().toString());
 
-      // Mostrar en visor grande
+      // Visor grande
       document.getElementById("imgGrande").src = nueva;
       document.getElementById("visorImagen").style.display = "flex";
+      document.getElementById("textoImg").innerText = '¡Saca esta imagen!';
 
-      document.getElementById("imagenActual").innerHTML = `Sacada: ${nueva.substring(nueva.lastIndexOf('/') + 1)}`;
-      debug.innerHTML = 'Imagen sacada y visible: ' + nueva;
+      document.getElementById("imagenActual").innerHTML = '✅ Sacada';
+      debug.innerHTML = 'Imagen proyectada: ' + nueva.split('/').pop();
     }
 
     function cerrarVisor() {
       document.getElementById("visorImagen").style.display = "none";
     }
 
-    // Detectar nuevas imágenes en jugadores
+    // Detectar en jugadores
     setInterval(() => {
       const ultima = localStorage.getItem("ultimaImagenBingo");
       const ts = localStorage.getItem("timestampBingo");
       if (ultima && ts && !sacadas.has(ultima)) {
         sacadas.add(ultima);
-        debug.innerHTML = 'Nueva imagen detectada y agregada.';
-        if (navigator.vibrate) navigator.vibrate(500);
+        debug.innerHTML = '¡Nueva imagen! 🔄';
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
-        // Auto-marcar si está en el cartón
+        // Auto-marcar
         const idx = carton.indexOf(ultima);
-        if (idx !== -1 && !marcadas.has(idx)) {
+        if (idx !== -1) {
           marcar(idx);
         }
       }
-    }, 2000);
+    }, 1500); // Más rápido para demo
 
-    // Nieve
+    // Nieve ligera
     function crearNieve() {
       const snow = document.getElementById("snow");
-      for(let i = 0; i < 50; i++) {
+      for(let i = 0; i < 30; i++) {
         const flake = document.createElement("div");
         flake.style.cssText = `
-          position: absolute; color: white; font-size: ${Math.random()*10+5}px;
-          left: ${Math.random()*100}vw; animation-duration: ${Math.random()*10+5}s;
-          opacity: ${Math.random()*0.5+0.5}; animation: caer ${Math.random()*10+5}s linear infinite;
+          position: absolute; color: white; font-size: ${Math.random()*8+4}px;
+          left: ${Math.random()*100}vw; animation-duration: ${Math.random()*8+4}s;
+          opacity: ${Math.random()*0.6+0.4}; animation: caer ${Math.random()*8+4}s linear infinite;
           pointer-events: none;
         `;
         flake.innerHTML = "❄";
@@ -384,17 +398,16 @@
 
     // Iniciar
     window.onload = () => {
-      debug.innerHTML = 'Iniciando...';
+      debug.innerHTML = '¡Bienvenido al Bingo! 🎄';
       generarCarton();
       crearNieve();
-      debug.innerHTML = '¡Listo para jugar!';
 
       if (location.search.includes("presentador")) {
         document.getElementById("presentador").style.display = "block";
         document.getElementById("carton").style.display = "none";
-        document.querySelector(".header").innerText = "Presentador - Bingo Navideño 🎅";
-        document.querySelector(".footer").innerText = "¡Saca imágenes!";
-        debug.innerHTML = 'Modo presentador: Presiona el botón.';
+        document.querySelector(".header").innerText = "Presentador 🎅";
+        document.querySelector(".footer").innerText = "¡Saca y proyecta!";
+        debug.innerHTML = 'Modo proyector listo.';
       }
     };
 
