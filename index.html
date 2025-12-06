@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Bingo Corona de Adviento</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0f292f 0%, #c41e3a 100%);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .snow {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    h1 {
+      text-align: center;
+      font-family: 'Mountains of Christmas', cursive;
+      font-size: 3.5rem;
+      margin: 20px 0;
+      text-shadow: 0 0 15px gold;
+      color: #ffd700;
+    }
+
+    #carton {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .celda {
+      aspect-ratio: 1;
+      background: #fff;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .celda img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .celda.marcada::after {
+      content: "✓";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 180, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: white;
+      animation: pulso 1s infinite;
+    }
+
+    @keyframes pulso {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    #btnBingo {
+      display: none;
+      margin: 30px auto;
+      padding: 20px 60px;
+      font-size: 2.5rem;
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      color: #b91d1d;
+      border: none;
+      border-radius: 50px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      cursor: pointer;
+      animation: latido 1.5s infinite;
+    }
+
+    @keyframes latido {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .ganador {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      font-size: 4rem;
+      text-align: center;
+    }
+
+    .ganador h2 {
+      font-family: 'Mountains of christmas', cursive;
+      color: gold;
+      animation: brillo 2s infinite;
+    }
+
+    @keyframes brillo {
+      0%,100% { text-shadow: 0 0 20px gold; }
+      50% { text-shadow: 0 0 60px gold, 0 0 100px orange; }
+    }
+
+    /* Modo presentador (oculto por defecto) */
+    #presentador {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      padding: 15px 30px;
+      border-radius: 50px;
+      display: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nieve animada -->
+  <div class="snow" id="snow"></div>
+
+  <h1>¡Bingo Corona de Adviento!</h1>
+
+  <div id="carton"></div>
+
+  <button id="btnBingo">¡BINGO! 🎄</button>
+
+  <!-- Pantalla de victoria -->
+  <div class="ganador" id="ganador">
+    <h2>¡BINGO!</h2>
+    <p>¡Felicidades! Eres el ganador 🎅✨</p>
+  </div>
+
+  <!-- Solo visible si pones ?presentador en la URL -->
+  <div id="presentador">
+    <button onclick="sacarImagen()">Sacar siguiente imagen</button>
+    <span id="imagenActual" style="margin-left:20px; font-size:1.5rem;"></span>
+  </div>
+
+  <!-- Lista de 24 imágenes navideñas (puedes cambiar las URLs por las tuyas) -->
+  <script>
+    const imagenes = [
+      "https://i.imgur.com/5QJ9XzP.png", // vela 1
+      "https://i.imgur.com/5eJ0T8j.png", // vela 2
+      "https://i.imgur.com/9E9k8pN.png", // vela 3
+      "https://i.imgur.com/3kM9rTc.png", // vela 4
+      "https://i.imgur.com/3fG9z8l.png", // estrella
+      "https://i.imgur.com/Z8p9L2m.png", // ángel
+      "https://i.imgur.com/J7kL9vP.png", // campana
+      "https://i.imgur.com/8mP9Q2r.png", // regalo
+      "https://i.imgur.com/5tR9vXm.png", // muérdago
+      "https://i.imgur.com/2kL9pQw.png", // bastón caramelo
+      "https://i.imgur.com/9jP9vZx.png", // árbol navidad
+      "https://i.imgur.com/7mK9rTy.png", // corona adviento
+      "https://i.imgur.com/4pL9vZx.png", // papa noel
+      "https://i.imgur.com/6tR9pQw.png", // reno
+      "https://i.imgur.com/1jP9vZx.png", // nieve
+      "https://i.imgur.com/8mK9rTy.png", // calcetín
+      "https://i.imgur.com/3fG9z8l.png", // galleta jengibre
+      "https://i.imgur.com/5eJ0T8j.png", // belén
+      "https://i.imgur.com/9E9k8pN.png", // bola navidad
+      "https://i.imgur.com/3kM9rTc.png", // trineo
+      "https://i.imgur.com/Z8p9L2m.png", // guirnalda
+      "https://i.imgur.com/J7kL9vP.png", // ponche
+      "https://i.imgur.com/8mP9Q2r.png", // luces
+      "https://i.imgur.com/5tR9vXm.png"  // niño Jesús
+    ];
+
+    let carton = [];
+    let marcadas = new Set();
+    let sacadas = new Set(); // para el presentador
+
+    // Generar cartón aleatorio único
+    function generarCarton() {
+      const copia = [...imagenes];
+      carton = [];
+      for(let i = 0; i < 12; i++) {
+        const rand = Math.floor(Math.random() * copia.length);
+        carton);
+        carton.push(copia.splice(rand, 1)[0]);
+      }
+
+      const grid = document.getElementById("carton");
+      grid.innerHTML = "";
+      carton.forEach((src, idx) => {
+        const div = document.createElement("div");
+        div.className = "celda";
+        div.innerHTML = `<img src="${src}" alt="imagen ${idx}">`;
+        div.onclick = () => marcar(idx);
+        grid.appendChild(div);
+      });
+    }
+
+    function marcar(idx) {
+      const key = carton[idx];
+      if (sacadas.has(key)) { // solo se puede marcar si ya salió
+        marcadas.add(idx);
+        document.querySelectorAll(".celda")[idx].classList.add("marcada");
+        comprobarBingo();
+      }
+    }
+
+    function comprobarBingo() {
+      const lineas = [
+        [0,1,2], [3,4,5], [6,7,8], [9,10,11], // horizontales
+        [0,3,6], [1,4,7], [2,5,8], [3,6,9], // verticales
+        [0,4,8], [2,4,10] // diagonales (solo hay 2 posibles en 3×4)
+      ];
+
+      for (let linea of lineas) {
+        if (linea.every(i => marcadas.has(i))) {
+          document.getElementById("btnBingo").style.display = "block";
+          return;
+        }
+      }
+    }
+
+    document.getElementById("btnBingo").onclick = () => {
+      document.getElementById("ganador").style.display = "flex";
+      // Aquí podrías enviar al servidor o hacer confeti, etc.
+    };
+
+    // Modo presentador
+    function sacarImagen() {
+      if (sacadas.size >= imagenes.length) {
+        alert("¡Se acabaron las imágenes!");
+        return;
+      }
+      let nueva;
+      do {
+        nueva = imagenes[Math.floor(Math.random() * imagenes.length)];
+      } while (sacadas.has(nueva));
+      sacadas.add(nueva);
+
+      // Mostrar grande en todos los dispositivos (usando localStorage simple)
+      localStorage.setItem("ultimaImagenBingo", nueva);
+      localStorage.setItem("timestampBingo", Date.now());
+
+      document.getElementById("imagenActual").innerHTML = `<img src="${nueva}" style="height:70px; border-radius:10px;">`;
+      
+      // Forzar recarga en jugadores (cada 3 segundos revisan)
+      location.reload(); // simple pero efectivo para demo
+    }
+
+    // Los jugadores revisan si salió nueva imagen
+    setInterval(() => {
+      const ultima = localStorage.getItem("ultimaImagenBingo");
+      const ts = localStorage.getItem("timestampBingo");
+      if (ultima && ts) {
+        sacadas.add(ultima);
+        // Si la imagen está en mi cartón y aún no la marqué → opcional auto-marcar
+      }
+    }, 3000);
+
+    // Nieve animada
+    function crearNieve() {
+      const snow = document.getElementById("snow");
+      for(let i = 0; i < 100; i++) {
+        const flake = document.createElement("div");
+        flake.style.position = "absolute";
+        flake.style.color = "white";
+        flake.style.fontSize = Math.random() * 20 + 10 + "px";
+        flake.style.left = Math.random() * 100 + "vw";
+        flake.style.animationDuration = Math.random() * 10 + 5 + "s";
+        flake.style.opacity = Math.random();
+        flake.innerHTML = "❄";
+        flake.style.animation = `caer ${flake.style.animationDuration} linear infinite`;
+        snow.appendChild(flake);
+      }
+    }
+
+    // Iniciar
+    window.onload = () => {
+      generarCarton();
+      crearNieve();
+
+      // Si es presentador
+      if (location.search.includes("presentador")) {
+        document.getElementById("presentador").style.display = "block";
+        document.getElementById("carton").style.display = "none";
+        document.querySelector("h1").innerText = "Presentador - Bingo Navideño";
+      }
+    };
+
+    // Animación nieve
+    const style = document.createElement("style");
+    style.innerHTML = `
+      @keyframes caer {
+        to { transform: translateY(100vh) rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
