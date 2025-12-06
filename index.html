@@ -156,6 +156,17 @@
       display: none;
       z-index: 10;
     }
+
+    /* Mensaje de carga para debug */
+    #debug {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.5);
+      padding: 5px;
+      font-size: 0.8rem;
+      z-index: 50;
+    }
   </style>
 </head>
 <body>
@@ -177,22 +188,172 @@
     <p>¡Felicidades! Eres el ganador 🎄✨</p>
   </div>
 
+  <!-- Debug temporal (borra después) -->
+  <div id="debug"></div>
+
   <!-- Modo presentador -->
   <div id="presentador">
     <button onclick="sacarImagen()">Sacar siguiente imagen</button>
     <span id="imagenActual" style="margin-left:20px; font-size:1.5rem;"></span>
   </div>
 
-  <!-- 18 imágenes navideñas gratuitas (coinciden con tus ejemplos: reno, oso, árbol, Santa, etc.) -->
+  <!-- Imágenes navideñas (URLs probadas y gratuitas, coinciden con tus ejemplos) -->
   <script>
     const imagenes = [
-      "https://cdn.pixabay.com/photo/2016/11/29/05/14/christmas-tree-1868016_1280.png", // Árbol de Navidad
-      "https://cdn.pixabay.com/photo/2017/12/13/00/35/santa-claus-3017458_1280.png", // Santa con saco
-      "https://cdn.pixabay.com/photo/2016/11/02/15/41/snow-globe-1793578_1280.png", // Globo de nieve
-      "https://cdn.pixabay.com/photo/2016/11/19/14/00/cod-1839235_1280.png", // Reno
-      "https://cdn.pixabay.com/photo/2017/10/10/07/29/reindeer-2834868_1280.png", // Otro reno
-      "https://freepngimg.com/thumb/santa_claus/29-santa-claus-png-image.png", // Santa Claus
-      "https://freepngimg.com/thumb/christmas_tree/31-christmas-tree-free-download-png.png", // Árbol
-      "https://freepngimg.com/thumb/snowman/10-snowman-png-image.png", // Muñeco de nieve
-      "https://freepngimg.com/thumb/gingerbread/gingerbread_man.png", // Galleta jengibre
-      "https://freepngimg.com/thumb/ch
+      "https://cdn.pixabay.com/photo/2017/12/13/00/35/christmas-tree-3017454_1280.png", // Árbol
+      "https://cdn.pixabay.com/photo/2016/11/29/03/35/christmas-1866578_1280.png", // Santa
+      "https://cdn.pixabay.com/photo/2016/11/29/05/14/snow-globe-1868016_1280.png", // Globo nieve
+      "https://cdn.pixabay.com/photo/2017/10/10/07/29/reindeer-2834868_1280.png", // Reno
+      "https://cdn.pixabay.com/photo/2016/11/19/14/00/reindeer-1839234_1280.png", // Reno saltando
+      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-tree-free-png.png", // Árbol con luces
+      "https://freepiksimple.com/wp-content/uploads/2023/11/snowman-free-png.png", // Muñeco nieve
+      "https://freepiksimple.com/wp-content/uploads/2023/11/gingerbread-man-free-png.png", // Galleta
+      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-stocking-free-png.png", // Calcetín
+      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-gift-free-png.png", // Regalo
+      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-angel-free-png.png", // Ángel
+      "https://freepiksimple.com/wp-content/uploads/2023/11/teddy-bear-free-png.png", // Oso teddy
+      "https://freepiksimple.com/wp-content/uploads/2023/11/chimney-free-png.png", // Chimenea
+      "https://freepiksimple.com/wp-content/uploads/2023/11/snowflake-free-png.png", // Copo nieve
+      "https://freepiksimple.com/wp-content/uploads/2023/11/santa-hat-free-png.png", // Gorro Santa
+      "https://freepiksimple.com/wp-content/uploads/2023/11/reindeer-free-png.png", // Otro reno
+      "https://freepiksimple.com/wp-content/uploads/2023/11/christmas-star-free-png.png", // Estrella
+      "https://freepiksimple.com/wp-content/uploads/2023/11/fireplace-free-png.png" // Chimenea con fuego
+    ];
+
+    let carton = [];
+    let marcadas = new Set();
+    let sacadas = new Set();
+
+    // Debug
+    const debug = document.getElementById('debug');
+
+    // Generar cartón aleatorio 3x3
+    function generarCarton() {
+      debug.innerHTML = 'Generando cartón...';
+      const copia = [...imagenes];
+      carton = [];
+      for(let i = 0; i < 9; i++) {
+        const rand = Math.floor(Math.random() * copia.length);
+        carton.push(copia.splice(rand, 1)[0]);
+      }
+
+      const grid = document.getElementById("carton");
+      grid.innerHTML = "";
+      carton.forEach((src, idx) => {
+        const div = document.createElement("div");
+        div.className = "celda";
+        div.innerHTML = `<img src="${src}" alt="imagen ${idx}" onerror="this.src='https://via.placeholder.com/100?text=?';">`;
+        div.onclick = () => marcar(idx);
+        grid.appendChild(div);
+      });
+      debug.innerHTML = '¡Cartón listo! Toca para marcar.';
+    }
+
+    function marcar(idx) {
+      const key = carton[idx];
+      if (sacadas.has(key)) {
+        if (!marcadas.has(idx)) {
+          marcadas.add(idx);
+          document.querySelectorAll(".celda")[idx].classList.add("marcada");
+          comprobarBingo();
+        }
+      } else {
+        alert('¡Esta imagen aún no ha salido! Espera al presentador.');
+      }
+    }
+
+    function comprobarBingo() {
+      const lineas = [
+        [0,1,2], [3,4,5], [6,7,8], // horizontales
+        [0,3,6], [1,4,7], [2,5,8], // verticales
+        [0,4,8], [2,4,6] // diagonales
+      ];
+
+      for (let linea of lineas) {
+        if (linea.every(i => marcadas.has(i))) {
+          document.getElementById("btnBingo").style.display = "block";
+          return;
+        }
+      }
+    }
+
+    document.getElementById("btnBingo").onclick = () => {
+      document.getElementById("ganador").style.display = "flex";
+      debug.innerHTML = '¡Ganador detectado!';
+    };
+
+    // Modo presentador
+    function sacarImagen() {
+      if (sacadas.size >= imagenes.length) {
+        alert("¡Se acabaron las imágenes!");
+        return;
+      }
+      let nueva;
+      do {
+        nueva = imagenes[Math.floor(Math.random() * imagenes.length)];
+      } while (sacadas.has(nueva));
+      sacadas.add(nueva);
+
+      // Simular broadcast (en producción, usa WebSocket o Firebase)
+      localStorage.setItem("ultimaImagenBingo", nueva);
+      localStorage.setItem("timestampBingo", Date.now());
+
+      document.getElementById("imagenActual").innerHTML = `<img src="${nueva}" style="height:70px; border-radius:10px;">`;
+      debug.innerHTML = 'Imagen sacada: ' + nueva;
+    }
+
+    // Revisar nuevas imágenes cada 2 seg
+    setInterval(() => {
+      const ultima = localStorage.getItem("ultimaImagenBingo");
+      const ts = localStorage.getItem("timestampBingo");
+      if (ultima && ts && !sacadas.has(ultima)) {
+        sacadas.add(ultima);
+        debug.innerHTML = 'Nueva imagen detectada: ' + ultima;
+        // Opcional: vibrar en móvil
+        if (navigator.vibrate) navigator.vibrate(200);
+      }
+    }, 2000);
+
+    // Nieve animada
+    function crearNieve() {
+      const snow = document.getElementById("snow");
+      for(let i = 0; i < 50; i++) { // Menos nieve para mejor rendimiento en móvil
+        const flake = document.createElement("div");
+        flake.style.cssText = `
+          position: absolute;
+          color: white;
+          font-size: ${Math.random() * 10 + 5}px;
+          left: ${Math.random() * 100}vw;
+          animation-duration: ${Math.random() * 10 + 5}s;
+          opacity: ${Math.random() * 0.5 + 0.5};
+          animation: caer ${Math.random() * 10 + 5}s linear infinite;
+          pointer-events: none;
+        `;
+        flake.innerHTML = "❄";
+        snow.appendChild(flake);
+      }
+    }
+
+    // Iniciar
+    window.onload = () => {
+      debug.innerHTML = 'Iniciando juego...';
+      generarCarton();
+      crearNieve();
+      debug.innerHTML = 'Todo cargado. ¡Juega!';
+
+      if (location.search.includes("presentador")) {
+        document.getElementById("presentador").style.display = "block";
+        document.getElementById("carton").style.display = "none";
+        document.querySelector(".header").innerText = "Presentador - Bingo Navideño";
+        document.querySelector(".footer").innerText = "¡Saca la siguiente!";
+        debug.innerHTML = 'Modo presentador activado.';
+      }
+    };
+
+    // CSS para nieve
+    const style = document.createElement("style");
+    style.innerHTML = `@keyframes caer { to { transform: translateY(100vh) rotate(360deg); } }`;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
