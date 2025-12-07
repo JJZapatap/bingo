@@ -2,320 +2,721 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Bingo Corona de Adviento</title>
+  <title>Bingo Navideño</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Poppins:wght@600&display=swap');
+    :root {
+      --rojo: #e53935;
+      --verde: #2e7d32;
+      --dorado: #ffca28;
+      --fondo: radial-gradient(circle at top, #ffebee 0, #e8f5e9 40%, #e1f5fe 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #0f292f 0%, #c41e3a 100%);
-      font-family: 'Poppins', sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--fondo);
       min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .snow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-
-    .header {
-      text-align: center;
-      background: #228B22;
-      color: white;
-      padding: 15px;
-      border-bottom: 6px solid #DC143C;
-      font-family: 'Mountains of Christmas', cursive;
-      font-size: 2.2rem;
-    }
-
-    #carton {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      max-width: 360px;
-      margin: 30px auto;
-      padding: 20px;
-      background: #90EE90;
-      border: 6px solid #DC143C;
-      border-radius: 15px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-    }
-
-    .celda {
-      aspect-ratio: 1;
-      background: white;
-      border: 3px solid #DC143C;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .celda img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 8px;
-    }
-
-    .celda.marcada::after {
-      content: "✓";
-      position: absolute;
-      inset: 0;
-      background: rgba(0,170,0,0.85);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 4rem;
-      color: white;
-      animation: pulso 1s infinite;
-      z-index: 2;
+      padding: 10px;
     }
 
-    @keyframes pulso { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
-
-    #btnBingo {
-      display: none;
-      margin: 40px auto;
-      padding: 20px 70px;
-      font-size: 2.8rem;
-      background: linear-gradient(45deg, #ffd700, #ffed4e);
-      color: #c41e3a;
-      border: none;
-      border-radius: 50px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      cursor: pointer;
-      animation: latido 1.5s infinite;
+    #app {
+      width: 100%;
+      max-width: 900px;
     }
 
-    @keyframes latido { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+    .card {
+      background: #ffffffee;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      padding: 16px;
+      border: 3px solid var(--verde);
+      position: relative;
+      overflow: hidden;
+    }
 
-    .ganador {
-      position: fixed;
+    .card::before {
+      content: "";
+      position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.92);
-      display: none;
-      flex-direction: column;
+      background-image: radial-gradient(#ffffff33 2px, transparent 2px);
+      background-size: 18px 18px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      background: var(--dorado);
+      color: #4e342e;
+      font-weight: 700;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 0 0 12px 0;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--rojo);
+      text-shadow: 0 1px 0 #fff;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 720px) {
+      .layout-presenter {
+        grid-template-columns: 2fr 1.1fr;
+      }
+    }
+
+    /* === CARTÓN JUGADOR === */
+
+    .bingo-card {
+      position: relative;
+      background: #fff;
+      border-radius: 18px;
+      padding: 10px;
+      border: 3px solid var(--rojo);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    .bingo-title {
+      text-align: center;
+      font-weight: 800;
+      color: var(--verde);
+      margin-bottom: 8px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .cell {
+      position: relative;
+      background: #fefefe;
+      border-radius: 12px;
+      padding: 4px;
+      border: 2px dashed #cfd8dc;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        border-color 0.12s ease, background 0.12s ease;
+    }
+
+    .cell:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+      border-color: var(--verde);
+    }
+
+    .cell img {
+      display: block;
+      width: 100%;
+      max-height: 80px;
+      object-fit: contain;
+      margin-bottom: 2px;
+    }
+
+    .cell-label {
+      font-size: 0.7rem;
+      text-align: center;
+      color: #455a64;
+      font-weight: 600;
+    }
+
+    .cell-mark {
+      position: absolute;
+      inset: 0;
+      display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100;
-      color: gold;
-      font-size: 5rem;
-      text-align: center;
+      background: #e5393544;
+      clip-path: circle(0% at 50% 50%);
+      transition: clip-path 0.2s ease-out, background 0.2s ease-out;
+      pointer-events: none;
     }
 
-    .footer {
-      text-align: center;
-      background: #228B22;
-      color: white;
-      padding: 12px;
-      border-top: 6px solid #DC143C;
-      font-family: 'Mountains of Christmas', cursive;
-      font-size: 1.8rem;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+    .cell-mark span {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+      transform: rotate(-18deg);
     }
 
-    #presentador {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      padding: 15px 35px;
-      border-radius: 3px solid #DC143C;
-      border-radius: 50px;
-      display: none;
-      z-index: 10;
-      color: white;
-      font-size: 1.3rem;
+    .cell.marked {
+      background: #ffebee;
+      border-style: solid;
+      border-color: var(--rojo);
+      transform: translateY(-2px) scale(1.01);
     }
 
-    #visorImagen {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%);
-      max-width: 90%;
-      max-height: 90%;
-      background: white;
-      border: 8px solid #DC143C;
-      border-radius: 20px;
-      z-index: 30;
-      padding: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,0.8);
-      text-align: center;
+    .cell.marked .cell-mark {
+      clip-path: circle(75% at 50% 50%);
     }
 
-    #visorImagen img { max-width: 100%; max-height: 70vh; }
+    .btn-row {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-    #visorImagen button {
-      margin-top: 20px;
-      padding: 12px 30px;
-      background: #228B22;
-      color: white;
+    button {
       border: none;
-      border-radius: 30px;
-      font-size: 1.4rem;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease,
+        background 0.1s ease, color 0.1s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--rojo), #ff7043);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(229, 57, 53, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(229, 57, 53, 0.45);
+    }
+
+    .btn-ghost {
+      background: #ffffff;
+      color: #37474f;
+      border: 1px solid #cfd8dc;
+    }
+
+    .btn-ghost:hover {
+      background: #eceff1;
+    }
+
+    .status {
+      margin-top: 6px;
+      text-align: center;
+      font-size: 0.85rem;
+      min-height: 1.3em;
+    }
+
+    .status-ok {
+      color: var(--verde);
+      font-weight: 700;
+    }
+
+    .status-error {
+      color: var(--rojo);
+      font-weight: 700;
+    }
+
+    /* === PRESENTADOR === */
+
+    .presenter-main {
+      background: linear-gradient(145deg, #fff3e0, #fff);
+      border-radius: 18px;
+      padding: 12px;
+      border: 3px solid var(--dorado);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+    }
+
+    .current-image-box {
+      position: relative;
+      background: #ffffffdd;
+      border-radius: 14px;
+      padding: 10px;
+      border: 2px solid #ffe082;
+      text-align: center;
+      min-height: 180px;
+    }
+
+    .current-image-box img {
+      max-width: 80%;
+      max-height: 180px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 6px;
+    }
+
+    .current-label {
+      font-weight: 800;
+      font-size: 1rem;
+      color: #5d4037;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .presenter-controls {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .drawn-list {
+      margin-top: 10px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 8px;
+      border: 1px solid #cfd8dc;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .drawn-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #546e7a;
+      margin-bottom: 6px;
+    }
+
+    .drawn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+      gap: 6px;
+    }
+
+    .drawn-item {
+      background: #f5f5f5;
+      border-radius: 10px;
+      padding: 4px;
+      text-align: center;
+      font-size: 0.6rem;
+      border: 1px solid #e0e0e0;
+    }
+
+    .drawn-item img {
+      max-width: 40px;
+      max-height: 40px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 2px;
+    }
+
+    .side-info {
+      background: #ffffffdd;
+      border-radius: 18px;
+      padding: 12px;
+      border: 2px dashed #cfd8dc;
+    }
+
+    .side-info h2 {
+      font-size: 0.95rem;
+      margin-top: 0;
+      margin-bottom: 6px;
+      color: #37474f;
+    }
+
+    .side-info p {
+      margin: 0 0 6px;
+      font-size: 0.8rem;
+      color: #546e7a;
+    }
+
+    .qr-box {
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .qr-box img {
+      width: 150px;
+      height: 150px;
+      border-radius: 12px;
+      border: 2px solid #cfd8dc;
+      background: #fff;
+      padding: 4px;
+    }
+
+    .small-note {
+      font-size: 0.7rem;
+      color: #78909c;
+      margin-top: 4px;
+    }
+
+    /* === MODAL BINGO === */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal {
+      background: radial-gradient(circle at top, #fff8e1, #ffffff);
+      padding: 18px 16px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      border: 3px solid var(--dorado);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--rojo);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+
+    .modal p {
+      margin: 4px 0 10px;
+      font-size: 0.9rem;
+      color: #5d4037;
+    }
+
+    .modal-emoji {
+      font-size: 2.4rem;
+      margin-bottom: 4px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+      animation: fadeIn 0.18s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Simple confeti fake */
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 40;
+    }
+
+    .confetti span {
+      position: absolute;
+      width: 8px;
+      height: 14px;
+      background: var(--rojo);
+      opacity: 0.9;
+      animation: confettiDrop 1.2s linear forwards;
+    }
+
+    @keyframes confettiDrop {
+      to {
+        transform: translateY(110vh) rotate(340deg);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
+  <div id="app"></div>
 
-  <div class="snow" id="snow"></div>
-
-  <div class="header">Merry Christmas</div>
-
-  <div id="carton"></div>
-
-  <button id="btnBingo">¡BINGO!</button>
-
-  <div class="footer">BINGO!</div>
-
-  <div class="ganador" id="ganador">
-    <h2>¡BINGO!</h2>
-    <p>¡Felicidades ganador!</p>
-  </div>
-
-  <div id="presentador">
-    <button onclick="sacarImagen()">Sacar siguiente imagen</button>
-  </div>
-
-  <div id="visorImagen">
-    <img id="imgGrande" src="" alt="">
-    <br>
-    <button onclick="document.getElementById('visorImagen').style.display='none'">Cerrar</button>
+  <!-- Modal Bingo -->
+  <div id="modal-bingo" class="modal-backdrop">
+    <div class="confetti" id="confetti-container"></div>
+    <div class="modal">
+      <div class="modal-emoji">🎉</div>
+      <div class="modal-title">¡BINGO!</div>
+      <p>Has llenado todo tu cartón.<br />Muestra la pantalla al animador.</p>
+      <button id="btnCerrarModal" class="btn-primary">Cerrar</button>
+    </div>
   </div>
 
   <script>
-    // Tus imágenes exactas dentro de la carpeta /img
-    const imagenes = [
-      "img/bauble.png",
-      "img/bow.png",
-      "img/candy-cane.png",
-      "img/cena-de-navidad.png",
-      "img/christmas-bell.png",
-      "img/christmas-sock.png",
-      "img/corona-de-navidad.png",
-      "img/decoration.png",
-      "img/jesus.png",
-      "img/pandereta.png",
-      "img/reno-de-navidad.png",
-      "img/santa-claus.png",
-      "img/santa-hat.png",
-      "img/snowman.png",
-      "img/star.png",
-      "img/vela-de-navidad.png"
+    // === CONFIGURACIÓN DE IMÁGENES ==========================
+    // Coloca las imágenes en /img/ y cambia los nombres si lo necesitas
+    const IMAGES = [
+      { id: "santa", label: "Papá Noel", src: "img/santa.png" },
+      { id: "tree", label: "Árbol", src: "img/tree.png" },
+      { id: "snowglobe", label: "Esfera de nieve", src: "img/snowglobe.png" },
+      { id: "reindeer", label: "Reno", src: "img/reindeer.png" },
+      { id: "gift", label: "Regalo", src: "img/gift.png" },
+      { id: "angel", label: "Ángel", src: "img/angel.png" },
+      { id: "fireplace", label: "Chimenea", src: "img/fireplace.png" },
+      { id: "stocking", label: "Media", src: "img/stocking.png" },
+      { id: "bear", label: "Osito", src: "img/bear.png" },
+      { id: "gingerbread", label: "Galleta", src: "img/gingerbread.png" },
+      { id: "snowflake", label: "Copo de nieve", src: "img/snowflake.png" },
+      { id: "snowman", label: "Muñeco de nieve", src: "img/snowman.png" }
     ];
 
-    let carton = [];
-    let marcadas = new Set();
-    let sacadas = new Set();
+    const ROWS = 4;
+    const COLS = 3;
 
-    function generarCarton() {
-      const copia = [...imagenes];
-      carton = [];
-      for(let i=0; i<9; i++){
-        let rand = Math.floor(Math.random()*copia.length);
-        carton.push(copia.splice(rand,1)[0]);
+    function shuffle(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
       }
+      return arr;
+    }
 
-      const grid = document.getElementById("carton");
-      grid.innerHTML = "";
-      carton.forEach((ruta, i) => {
-        const div = document.createElement("div");
-        div.className = "celda";
-        div.innerHTML = `<img src="${ruta}" alt="img">`;
-        div.onclick = () => marcar(i);
-        grid.appendChild(div);
+    function isPresenterMode() {
+      const params = new URLSearchParams(window.location.search);
+      return params.has("presentador");
+    }
+
+    // === VISTA JUGADOR ======================================
+    function renderPlayer() {
+      document.title = "Bingo Navideño - Jugador";
+      const app = document.getElementById("app");
+
+      const shuffled = shuffle(IMAGES).slice(0, ROWS * COLS);
+
+      app.innerHTML = `
+        <div class="card">
+          <header>
+            <div class="badge">Modo jugador</div>
+            <h1>Bingo Navideño</h1>
+            <p class="subtitle">Toca las imágenes que aparezcan en pantalla. Cuando llenes tu cartón, pulsa ¡BINGO!</p>
+          </header>
+
+          <div class="layout">
+            <div>
+              <div class="bingo-card">
+                <div class="bingo-title">B I N G O</div>
+                <div class="grid" id="grid"></div>
+              </div>
+              <div class="btn-row">
+                <button id="btnBingo" class="btn-primary">¡BINGO!</button>
+                <button id="btnNuevo" class="btn-ghost">Nuevo cartón</button>
+              </div>
+              <div id="status" class="status"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const grid = document.getElementById("grid");
+      shuffled.forEach((img) => {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.id = img.id;
+        cell.innerHTML = `
+          <img src="${img.src}" alt="${img.label}" />
+          <div class="cell-label">${img.label}</div>
+          <div class="cell-mark"><span>★</span></div>
+        `;
+        cell.addEventListener("click", () => {
+          cell.classList.toggle("marked");
+        });
+        grid.appendChild(cell);
+      });
+
+      document.getElementById("btnBingo").addEventListener("click", () => {
+        const cells = Array.from(document.querySelectorAll(".cell"));
+        const allMarked = cells.every((c) => c.classList.contains("marked"));
+        const status = document.getElementById("status");
+        if (allMarked) {
+          status.textContent = "";
+          showBingoModal();
+        } else {
+          status.textContent = "Todavía no has llenado todas las casillas.";
+          status.className = "status status-error";
+        }
+      });
+
+      document.getElementById("btnNuevo").addEventListener("click", () => {
+        // Recargar la página para un cartón nuevo
+        window.location.reload();
       });
     }
 
-    function marcar(i) {
-      if (sacadas.has(carton[i])) {
-        if (!marcadas.has(i)) {
-          marcadas.add(i);
-          document.querySelectorAll(".celda")[i].classList.add("marcada");
-          comprobarBingo();
+    // === VISTA PRESENTADOR ==================================
+    function renderPresenter() {
+      document.title = "Bingo Navideño - Presentador";
+      const app = document.getElementById("app");
+
+      app.innerHTML = `
+        <div class="card layout layout-presenter">
+          <div class="presenter-main">
+            <header>
+              <div class="badge">Modo presentador</div>
+              <h1>Bingo Navideño</h1>
+              <p class="subtitle">Proyecta esta pantalla. Las figuras aparecerán una a una.</p>
+            </header>
+
+            <div class="current-image-box">
+              <div id="currentContent">
+                <p class="small-note">Pulsa "Iniciar" para mostrar la primera figura.</p>
+              </div>
+            </div>
+
+            <div class="presenter-controls">
+              <button id="btnNext" class="btn-primary">Iniciar / Siguiente</button>
+              <button id="btnReset" class="btn-ghost">Reiniciar sorteo</button>
+            </div>
+
+            <div class="drawn-list">
+              <div class="drawn-title">Figuras ya mostradas</div>
+              <div id="drawnGrid" class="drawn-grid"></div>
+            </div>
+          </div>
+
+          <aside class="side-info">
+            <h2>Cómo jugar</h2>
+            <p>1. Pide a los participantes que escaneen el código QR y reciban su cartón.</p>
+            <p>2. Tú, como presentador, vas mostrando las imágenes sorteadas.</p>
+            <p>3. Ellos marcan en su dispositivo. Al llenar todo el cartón, pulsan el botón <strong>¡BINGO!</strong>.</p>
+
+            <div class="qr-box">
+              <!-- Ejemplo usando un servicio público de QR (puedes cambiarlo o generar tu propio código). -->
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fjjzapatap.github.io%2Fbingo%2F"
+                alt="QR para jugadores"
+              />
+              <div class="small-note">
+                QR de ejemplo para <strong>https://jjzapatap.github.io/bingo/</strong>.
+              </div>
+            </div>
+          </aside>
+        </div>
+      `;
+
+      let deck = shuffle(IMAGES);
+      let index = -1;
+
+      const currentDiv = document.getElementById("currentContent");
+      const drawnGrid = document.getElementById("drawnGrid");
+
+      function renderCurrent() {
+        if (index < 0) {
+          currentDiv.innerHTML =
+            '<p class="small-note">Pulsa "Iniciar" para mostrar la primera figura.</p>';
+          return;
+        }
+        const item = deck[index];
+        currentDiv.innerHTML = `
+          <img src="${item.src}" alt="${item.label}" />
+          <div class="current-label">${item.label}</div>
+        `;
+      }
+
+      function renderDrawn() {
+        drawnGrid.innerHTML = "";
+        for (let i = 0; i <= index; i++) {
+          const item = deck[i];
+          const el = document.createElement("div");
+          el.className = "drawn-item";
+          el.innerHTML = `
+            <img src="${item.src}" alt="${item.label}" />
+            <div>${item.label}</div>
+          `;
+          drawnGrid.appendChild(el);
         }
       }
-    }
 
-    function comprobarBingo() {
-      const lineas = [
-        [0,1,2],[3,4,5],[6,7,8], // horizontal
-        [0,3,6],[1,4,7],[2,5,8], // vertical
-        [0,4,8],[2,4,6]         // diagonales
-      ];
-      for(let l of lineas){
-        if(l.every(n => marcadas.has(n))){
-          document.getElementById("btnBingo").style.display = "block";
-          break;
+      document.getElementById("btnNext").addEventListener("click", () => {
+        if (index >= deck.length - 1) {
+          // Ya se mostraron todas
+          currentDiv.innerHTML = `
+            <div class="current-label" style="letter-spacing:.06em;">
+              ¡No hay más figuras!
+            </div>
+            <p class="small-note">Pulsa "Reiniciar sorteo" para comenzar de nuevo.</p>
+          `;
+          return;
         }
-      }
+        index++;
+        renderCurrent();
+        renderDrawn();
+      });
+
+      document.getElementById("btnReset").addEventListener("click", () => {
+        deck = shuffle(IMAGES);
+        index = -1;
+        renderCurrent();
+        renderDrawn();
+      });
+
+      renderCurrent();
+      renderDrawn();
     }
 
-    document.getElementById("btnBingo").onclick = () => {
-      document.getElementById("ganador").style.display = "flex";
-    };
+    // === MODAL Y CONFETI ====================================
+    function showBingoModal() {
+      const backdrop = document.getElementById("modal-bingo");
+      const confettiContainer = document.getElementById("confetti-container");
+      confettiContainer.innerHTML = "";
 
-    function sacarImagen() {
-      if(sacadas.size >= imagenes.length) return alert("¡No hay más imágenes!");
-      let nueva;
-      do{
-        nueva = imagenes[Math.floor(Math.random()*imagenes.length)];
-      }while(sacadas.has(nueva));
-      sacadas.add(nueva);
+      const pieces = 40;
+      for (let i = 0; i < pieces; i++) {
+        const span = document.createElement("span");
+        const left = Math.random() * 100;
+        const delay = Math.random() * 0.6;
+        const scale = 0.7 + Math.random() * 0.7;
+        span.style.left = left + "vw";
+        span.style.animationDelay = delay + "s";
+        span.style.transform = "scale(" + scale + ")";
+        if (i % 3 === 0) span.style.background = "#ffca28";
+        if (i % 3 === 1) span.style.background = "#66bb6a";
+        confettiContainer.appendChild(span);
+      }
 
-      // Guardamos para que todos los jugadores la vean
-      localStorage.setItem("bingoImagen", nueva);
-      localStorage.setItem("bingoTime", Date.now());
-
-      // Mostrar en pantalla grande (presentador)
-      document.getElementById("imgGrande").src = nueva;
-      document.getElementById("visorImagen").style.display = "block";
+      backdrop.classList.add("show");
     }
 
-    // Los jugadores detectan la nueva imagen
-    setInterval(()=>{
-      const img = localStorage.getItem("bingoImagen");
-      const time = localStorage.getItem("bingoTime");
-      if(img && time && !sacadas.has(img)){
-        sacadas.add(img);
-        const idx = carton.indexOf(img);
-        if(idx !== -1) marcar(idx);
-        if(navigator.vibrate) navigator.vibrate(300);
-      }
-    },1500);
+    document.getElementById("btnCerrarModal").addEventListener("click", () => {
+      document.getElementById("modal-bingo").classList.remove("show");
+    });
 
-    // Nieve navideña
-    function nieve(){
-      const s = document.getElementById("snow");
-      for(let i=0;i<40;i++){
-        let f = document.createElement("div");
-        f.innerHTML = "❄";
-        f.style.cssText = `position:absolute; color:white; font-size:${10+Math.random()*15}px; 
-        left:${Math.random()*100}vw; animation: caer ${5+Math.random()*10}s linear infinite; opacity:${0.4+Math.random()*0.6}`;
-        s.appendChild(f);
-      }
+    // === INICIO =============================================
+    if (isPresenterMode()) {
+      renderPresenter();
+    } else {
+      renderPlayer();
     }
-
-    window.onload = () => {
-      generarCarton();
-      nieve();
-
-      if(location.search.includes("presentador")){
-        document.getElementById("presentador").style.display = "block";
-        document.getElementById("carton").style.display = "none";
-        document.querySelector(".header").innerText = "Presentador - Bingo Navideño";
-      }
-    };
-
-    // Animación nieve
-    document.head.innerHTML += `<style>@keyframes caer{to{transform:translateY(100vh) rotate(360deg)}}</style>`;
   </script>
 </body>
 </html>
